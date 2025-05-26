@@ -1,15 +1,30 @@
-# Node modules
+# Node.js
 node_modules/
-
-# Environment files
 .env
 
 # Logs
 logs/
 *.log
+*.log.*
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# MongoDB Cluster Runtime Files
+mongo-cluster/**/WiredTiger*
+mongo-cluster/**/mongod.lock
+mongo-cluster/**/journal/
+mongo-cluster/**/diagnostic.data/
+mongo-cluster/**/*.wt
+mongo-cluster/**/*.ns
+mongo-cluster/**/*.turtle
+mongo-cluster/**/*.snappy
+mongo-cluster/**/*.wtc
+mongo-cluster/**/*.log
+mongo-cluster/**/*.log.*
+
+# Mongos diagnostic folder
+mongos.diagnostic.data
 
 # OS-specific
 .DS_Store
@@ -19,20 +34,6 @@ Thumbs.db
 .vscode/
 .idea/
 
-# MongoDB data folders
-mongo-cluster/**/journal/
-mongo-cluster/**/diagnostic.data/
-mongo-cluster/**/WiredTiger*
-mongo-cluster/**/mongod.lock
-mongo-cluster/**/*.wt
-mongo-cluster/**/*.ns
-mongo-cluster/**/*.wtc
-mongo-cluster/**/*.turtle
-mongo-cluster/**/*.snappy
-
-# Optional: ignore all mongo data folders (use only if you're sure)
-# mongo-cluster/*
-
-# Optional: ignore test artifacts
+# Misc
 *.bak
 *.tmp
