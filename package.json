@@ -1,0 +1,14 @@
+{
+  "name": "ecommerce-cluster-test",
+  "version": "1.0.0",
+  "description": "Test app for connecting to MongoDB sharded cluster via mongos",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "Dean van Zyl",
+  "license": "MIT",
+  "dependencies": {
+    "mongodb": "^6.3.0"
+  }
+}
