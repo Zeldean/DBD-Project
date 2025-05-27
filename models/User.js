@@ -23,8 +23,12 @@ const UserSchema = new mongoose.Schema({
   createdAt: { 
     type: Date, 
     default: Date.now
-  }
-  
+  },
+  region: {
+  type: String,
+  required: true,
+  enum: ['Europe', 'Asia', 'US']
+  }  
 });
 const User = mongoose.model('User', UserSchema);
 module.exports = {User};
