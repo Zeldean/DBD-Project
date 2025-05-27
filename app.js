@@ -1,32 +1,47 @@
-const { MongoClient } = require('mongodb');
+const express = require('express');
+const mongoose = require('mongoose');
+const morgan = require('morgan');
 
-const uri = "mongodb://localhost:30000";
-const client = new MongoClient(uri);
+const userRoutes = require('./routes/users');
+const productRoutes = require('./routes/products');
+const orderRoutes = require('./routes/orders');
 
-async function run() {
-  try {
-    await client.connect();
-    console.log("✅ Connected to MongoDB via mongos");
+const app = express();
+const PORT = process.env.PORT || 5000;
 
-    const db = client.db("ecommerce");
-    const products = db.collection("products");
+// Middleware
+app.use(express.json());
+app.use(morgan('dev'));
 
-    // Insert a test product
-    const result = await products.insertOne({
-      name: "Clustered Laptop",
-      region: "Europe"
-    });
-
-    console.log("Inserted product with _id:", result.insertedId);
-
-    // Fetch and display all products
-    const allProducts = await products.find().toArray();
-    console.log("All products:", allProducts);
-  } catch (err) {
-    console.error("❌ Connection or operation failed:", err);
-  } finally {
-    await client.close();
+// Optional: Middleware to auto-attach region from headers
+app.use((req, res, next) => {
+  const region = req.headers['x-region'];
+  if (region && ['Europe', 'Asia', 'US'].includes(region)) {
+    req.region = region;
   }
-}
+  next();
+});
 
-run();
+// MongoDB connection via mongos router
+mongoose.connect('mongodb://localhost:30000/ecommerce', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+}).then(() => {
+  console.log('Connected to sharded MongoDB cluster');
+}).catch(err => {
+  console.error('MongoDB connection error:', err.message);
+});
+
+// Routes
+app.get('/', (req, res) => {
+  res.send('MongoDB Sharded API Running');
+});
+
+app.use('/users', userRoutes);
+app.use('/products', productRoutes);
+app.use('/orders', orderRoutes);
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
