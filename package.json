@@ -4,11 +4,24 @@
   "description": "Test app for connecting to MongoDB sharded cluster via mongos",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "dev": "nodemon app.js"
   },
-  "author": "Dean van Zyl",
+  "author": "Zeldean",
   "license": "MIT",
   "dependencies": {
-    "mongodb": "^6.3.0"
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "mongodb": "^6.3.0",
+    "mongoose": "^8.15.1",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10",
+    "eslint": "^8.58.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-n": "^16.6.2",
+    "eslint-plugin-promise": "^6.1.1"
   }
 }

@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
+require('dotenv').config();
 
 const userRoutes = require('./routes/users');
 const productRoutes = require('./routes/products');
@@ -8,6 +9,7 @@ const orderRoutes = require('./routes/orders');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:30000/ecommerce';
 
 // Middleware
 app.use(express.json());
@@ -23,10 +25,8 @@ app.use((req, res, next) => {
 });
 
 // MongoDB connection via mongos router
-mongoose.connect('mongodb://localhost:30000/ecommerce', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-}).then(() => {
+mongoose.connect(MONGO_URI)
+.then(() => {
   console.log('Connected to sharded MongoDB cluster');
 }).catch(err => {
   console.error('MongoDB connection error:', err.message);

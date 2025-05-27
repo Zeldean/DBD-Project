@@ -26,9 +26,9 @@ This project simulates a fully distributed NoSQL database system using **MongoDB
 project-root/
 ├── mongo-cluster/
 │   ├── cfg1/, cfg2/, cfg3/       # Config server data folders (cfg1 is primary)
-│   ├── rs\_eu1/, rs\_eu2/          # EU shard replica set
-│   ├── rs\_asia1/, rs\_asia2/      # Asia shard replica set
-│   └── rs\_us1/, rs\_us2/          # US shard replica set
+│   ├── rs_eu1/, rs_eu2/          # EU shard replica set
+│   ├── rs_asia1/, rs_asia2/      # Asia shard replica set
+│   └── rs_us1/, rs_us2/          # US shard replica set
 ├── scripts/
 │   ├── start-cluster.bat         # Starts all MongoDB nodes
 │   └── individual start-\*.bat    # Start each node manually if needed
