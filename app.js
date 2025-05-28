@@ -3,9 +3,10 @@ const mongoose = require('mongoose');
 const morgan = require('morgan');
 require('dotenv').config();
 
-const userRoutes = require('./routes/users');
-const productRoutes = require('./routes/products');
-const orderRoutes = require('./routes/orders');
+// const userRoutes = require('./routes/users');
+// const productRoutes = require('./routes/products');
+// const orderRoutes = require('./routes/orders');
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -37,9 +38,12 @@ app.get('/', (req, res) => {
   res.send('MongoDB Sharded API Running');
 });
 
-app.use('/users', userRoutes);
-app.use('/products', productRoutes);
-app.use('/orders', orderRoutes);
+app.use('/api/public', require('./routes/public'));
+app.use('/api/user', require('./routes/user'));
+app.use('/api/admin', require('./routes/admin'));
+// app.use('/users', userRoutes);
+// app.use('/products', productRoutes);
+// app.use('/orders', orderRoutes);
 
 // Start server
 app.listen(PORT, () => {
