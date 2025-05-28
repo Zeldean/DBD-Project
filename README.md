@@ -31,13 +31,13 @@ project-root/
 │   └── rs_us1/, rs_us2/          # US shard replica set
 ├── scripts/
 │   ├── start-cluster.bat         # Starts all MongoDB nodes
-│   └── individual start-\*.bat    # Start each node manually if needed
+│   └── individual start-*.bat    # Start each node manually if needed
 ├── routes/                       # Express routers for users, products, orders
 ├── models/                       # Mongoose schemas with validation and region support
 ├── app.js                        # Main Express server
 ├── package.json                  # Node.js dependencies
 └── README.md                     # This file
-```
+````
 
 `.gitkeep` is used to track empty folders. MongoDB data files (`.wt`, `.turtle`, etc.) are excluded via `.gitignore`.
 
@@ -45,25 +45,13 @@ project-root/
 
 ## ⚙️ Setup Steps
 
-### 📁 1. Create Folder Structure
-
-Run:
-
-```ps
-scripts/setup-folders.bat
-```
-
-Or manually create the folders listed under `mongo-cluster/`.
-
----
-
-### 🔋 2. Start the MongoDB Cluster
+### 🔋 1. Start the MongoDB Cluster
 
 Run:
 
 ```ps
 scripts/start-cluster.bat
-````
+```
 
 This starts:
 
@@ -73,15 +61,13 @@ This starts:
 
 > Each node opens in a new terminal window. Keep them open.
 
----
-
-### 🧠 3. Initialize Config Server Replica Set
+### 🧠 2. Initialize Config Server Replica Set
 
 Connect:
 
 ```bash
 mongosh --port 26001
-````
+```
 
 Then run:
 
@@ -95,9 +81,7 @@ rs.initiate({
 })
 ```
 
----
-
-### 🧱 4. Initialize Each Shard Replica Set
+### 🧱 3. Initialize Each Shard Replica Set
 
 #### EU
 
@@ -147,9 +131,7 @@ rs.initiate({
 })
 ```
 
----
-
-### 🌍 5. Add Shards to the Cluster
+### 🌍 4. Add Shards to the Cluster
 
 Connect to router:
 
@@ -165,9 +147,7 @@ sh.addShard("rs_asia/localhost:27101,localhost:27102")
 sh.addShard("rs_us/localhost:27201,localhost:27202")
 ```
 
----
-
-### 🗃️ 6. Enable Sharding on `ecommerce` Database
+### 🗃️ 5. Enable Sharding on `ecommerce` Database
 
 ```js
 sh.enableSharding("ecommerce")
@@ -192,7 +172,7 @@ sh.shardCollection("ecommerce.orders", { region: 1 })
 
 ---
 
-## 🧪 7. Test the App
+## 🧪 6. Test the App
 
 Install dependencies:
 
@@ -214,19 +194,40 @@ Your Express server:
 
 ---
 
-## 📮 API Overview
+## 📚 API Usage Guide
 
-| Route       | Method | Description                       |
-| ----------- | ------ | --------------------------------- |
-| `/users`    | GET    | List users in current region      |
-| `/users`    | POST   | Create a user in current region   |
-| `/products` | GET    | List products available in region |
-| `/products` | POST   | Add new product with region list  |
-| `/orders`   | GET    | List orders placed in this region |
-| `/orders`   | POST   | Place a new order in this region  |
+### 🟢 Public Routes (`/public`)
 
-> Each request should include a header:
-> `x-region: Europe` (or `Asia`, `US`)
+|Endpoint|Method|Description|Headers|Body Params|Returns|
+|---|---|---|---|---|---|
+|`/public/products`|GET|Get all available products|`x-region`|—|200 OK – array of products|
+|`/public/register`|POST|Register a new user|`x-region`|`name`, `email`, `password` (≥6), `address.{street,city,postalCode,country}`, `region`|201 Created – user object400 Bad Request|
+|`/public/health`|GET|Ping endpoint to check server health|—|—|200 OK – status message|
+
+### 🔵 User Routes (`/user`)
+
+> All require headers: `x-user-email`, `x-user-password`, `x-region`
+
+|Endpoint|Method|Description|Headers|Body Params|Returns|
+|---|---|---|---|---|---|
+|`/user/profile`|GET|Get current authenticated user|✅|—|200 OK – user object|
+|`/user/orders`|GET|Get current user's orders|✅|—|200 OK – array of orders|
+|`/user/orders`|POST|Place a new order|✅|`items[].productId`, `items[].quantity` (≥1), `totalPrice`|201 Created – new order400 Validation error|
+|`/user/reviews`|GET|Get all reviews by the user|✅|—|200 OK – array of reviews|
+|`/user/reviews`|POST|Add review to a product|✅|`productId`, `rating` (1–5), `comment` (≥5 chars)|201 Created – updated product400 Bad Request|
+|`/user/spending`|GET|Get total spending by the user|✅|—|200 OK – `{ totalSpent }`|
+
+### 🔴 Admin Routes (`/admin`)
+
+> All require headers: `x-admin-secret`, `x-region`
+
+|Endpoint|Method|Description|Headers|Body Params|Returns|
+|---|---|---|---|---|---|
+|`/admin/users`|GET|List all users in region|✅|—|200 OK – array of users|
+|`/admin/orders`|GET|View all orders in region|✅|—|200 OK – array of orders|
+|`/admin/reviews`|GET|View all reviews in region|✅|—|200 OK – array of reviews|
+|`/admin/products`|POST|Add a new product|✅|`name`, `description` (≥10), `price`, `category`, `regions[]`|201 Created – product400 Bad Request|
+|`/admin/product/:id`|DELETE|Remove a product by ID|✅|—|200 OK – success message404 Not Found|
 
 ---
 
@@ -235,9 +236,8 @@ Your Express server:
 - Make sure all windows stay open
 - Restart any crashed node
 - Use:
-
-  - `rs.status()` inside each replica
-  - `sh.status()` inside `mongos`
+    - `rs.status()` inside each replica
+    - `sh.status()` inside `mongos`
 - Cluster failing? Delete `mongo-cluster/` folders and reinitialize
 
 ---
