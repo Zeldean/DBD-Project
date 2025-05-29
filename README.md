@@ -149,14 +149,21 @@ sh.addShard("rs_us/localhost:27201,localhost:27202")
 
 ### 🗃️ 5. Enable Sharding on `ecommerce` Database
 
+Enable sharding on the database:
+
 ```js
 sh.enableSharding("ecommerce")
 ```
 
-Then index the shard key fields:
+Switch to the database:
 
 ```js
 use ecommerce
+```
+
+Create shard key indexes on each collection:
+
+```js
 db.users.createIndex({ region: 1 })
 db.products.createIndex({ region: 1 })
 db.orders.createIndex({ region: 1 })
@@ -170,7 +177,14 @@ sh.shardCollection("ecommerce.products", { region: 1 })
 sh.shardCollection("ecommerce.orders", { region: 1 })
 ```
 
----
+If you need to enforce email uniqueness in the `users` collection, you must create a **compound unique index** (after sharding) like so:
+
+```js
+db.users.createIndex({ region: 1, email: 1 }, { unique: true })
+```
+
+> ⚠️ Note: MongoDB requires the shard key to be included in any unique index for sharded collections.
+
 
 ## 🧪 6. Test the App
 

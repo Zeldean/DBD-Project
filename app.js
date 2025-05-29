@@ -3,7 +3,9 @@ const mongoose = require('mongoose');
 const morgan = require('morgan');
 require('dotenv').config();
 
-// const userRoutes = require('./routes/users');
+const publicRoute = require('./routes/public')
+const userRoutes = require('./routes/user');
+const adminRoutes = require('./routes/admin');
 // const productRoutes = require('./routes/products');
 // const orderRoutes = require('./routes/orders');
 
@@ -38,9 +40,9 @@ app.get('/', (req, res) => {
   res.send('MongoDB Sharded API Running');
 });
 
-app.use('/api/public', require('./routes/public'));
-app.use('/api/user', require('./routes/user'));
-app.use('/api/admin', require('./routes/admin'));
+app.use('/api/public', publicRoute);
+app.use('/api/user', userRoutes);
+app.use('/api/admin', adminRoutes);
 // app.use('/users', userRoutes);
 // app.use('/products', productRoutes);
 // app.use('/orders', orderRoutes);
