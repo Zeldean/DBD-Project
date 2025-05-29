@@ -63,6 +63,27 @@ router.post('/orders', async (req, res) => {
   }
 });
 
+// DELETE a pending order
+router.delete('/orders/:id', async (req, res) => {
+  try {
+    const result = await Order.findOneAndDelete({
+      _id: req.params.id,
+      userId: req.user._id,
+      region: req.region,
+      status: 'Pending'
+    });
+
+    if (!result) {
+      return res.status(404).json({ error: 'Pending order not found or not allowed to delete' });
+    }
+
+    res.json({ message: 'Order deleted successfully', deletedOrderId: result._id });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete order: ' + err.message });
+  }
+});
+
+
 // GET user total spending
 router.get('/spending', async (req, res) => {
   const orders = await Order.find({ userId: req.user._id, region: req.region });
@@ -137,5 +158,7 @@ router.post('/reviews', async (req, res) => {
     res.status(400).json({ error: 'Failed to submit review: ' + err.message });
   }
 });
+
+
 
 module.exports = router;
