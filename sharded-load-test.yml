@@ -1,0 +1,13 @@
+config:
+  target: "http://localhost:5000"
+  phases:
+    - duration: 30
+      arrivalRate: 10
+  defaults:
+    headers:
+      x-region: Europe
+
+scenarios:
+  - flow:
+      - get:
+          url: "/products"
