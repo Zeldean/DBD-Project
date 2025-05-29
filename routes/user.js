@@ -138,6 +138,43 @@ router.get('/reviews', async (req, res) => {
   }
 });
 
+// PUT update a review for a product
+router.put('/reviews/:productId', async (req, res) => {
+  try {
+    const { rating, comment } = req.body;
+    const { productId } = req.params;
+
+    if (typeof rating !== 'number' || rating < 1 || rating > 5 || typeof comment !== 'string') {
+      return res.status(400).json({ error: 'Invalid review format' });
+    }
+
+    const product = await Product.findOne({
+      _id: productId,
+      regions: req.region
+    });
+
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found in this region' });
+    }
+
+    const review = product.reviews.find(r => r.userId.equals(req.user._id));
+    if (!review) {
+      return res.status(404).json({ error: 'Review not found for this user' });
+    }
+
+    review.rating = rating;
+    review.comment = comment;
+    review.createdAt = new Date();
+
+    await product.save();
+
+    res.json({ message: 'Review updated successfully', review });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update review: ' + err.message });
+  }
+});
+
+
 // POST add a new review to a product
 router.post('/reviews', async (req, res) => {
   try {
