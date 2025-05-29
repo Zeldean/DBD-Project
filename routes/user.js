@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
 const { User } = require('../models/User');
 const { Order } = require('../models/Order');
@@ -22,6 +23,7 @@ router.use(async (req, res, next) => {
 
   const user = await User.findOne({ email: email.toLowerCase(), region: req.region, password: pass});
   if (!user) return res.status(404).json({ error: 'User not found' });
+  
 
   req.user = user;
   next();
@@ -70,18 +72,49 @@ router.get('/spending', async (req, res) => {
 
 // GET user's reviews
 router.get('/reviews', async (req, res) => {
-  const products = await Product.find({
-    region: req.region,
-    'reviews.userId': req.user._id
-  });
+  const userId = req.user._id;
+  const region = req.region;
 
-  const reviews = products.flatMap(product =>
-    product.reviews
-      .filter(r => r.userId.equals(req.user._id))
-      .map(r => ({ ...r.toObject(), productId: product._id, productName: product.name }))
-  );
+  try {
+    const reviews = await Product.aggregate([
+      {
+        $match: {
+          regions: region,
+          'reviews.userId': userId
+        }
+      },
+      {
+        $project: {
+          name: 1,
+          matchedReviews: {
+            $filter: {
+              input: '$reviews',
+              as: 'rev',
+              cond: { $eq: ['$$rev.userId', userId] }
+            }
+          }
+        }
+      },
+      { $unwind: '$matchedReviews' },
+      {
+        $replaceRoot: {
+          newRoot: {
+            $mergeObjects: [
+              '$matchedReviews',
+              {
+                productId: '$_id',
+                productName: '$name'
+              }
+            ]
+          }
+        }
+      }
+    ]);
 
-  res.json(reviews);
+    res.json(reviews);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to aggregate reviews' });
+  }
 });
 
 // POST add a new review to a product
