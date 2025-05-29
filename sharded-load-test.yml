@@ -5,9 +5,26 @@ config:
       arrivalRate: 10
   defaults:
     headers:
-      x-region: Europe
+      Content-Type: "application/json"
 
 scenarios:
-  - flow:
+  - name: "Load Europe Products"
+    flow:
       - get:
           url: "/products"
+          headers:
+            x-region: Europe
+
+  - name: "Load Asia Products"
+    flow:
+      - get:
+          url: "/products"
+          headers:
+            x-region: Asia
+
+  - name: "Load US Products"
+    flow:
+      - get:
+          url: "/products"
+          headers:
+            x-region: US

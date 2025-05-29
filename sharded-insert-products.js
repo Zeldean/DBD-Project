@@ -17,14 +17,18 @@ async function insertProducts() {
       category: i % 2 === 0 ? "electronics" : "clothing",
       stock: random(1, 50),
       seller_id: `U${random(1, 100)}`,
+      region: region,
       regions: [region]
     };
 
     try {
-      await axios.post("http://localhost:5000/products", product, {
-        headers: { "x-region": region }
+      const response = await axios.post("http://localhost:5000/products", product, {
+        headers: {
+          "Content-Type": "application/json",
+          "x-region": region
+        }
       });
-      console.log(`✔ Inserted product ${i + 1} to ${region}`);
+      console.log(`✅ Inserted product ${i + 1} to ${region}`);
     } catch (err) {
       console.error(`❌ Failed to insert product ${i + 1}:`, err.response?.data || err.message);
     }
